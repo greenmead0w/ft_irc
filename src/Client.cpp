@@ -1,0 +1,1 @@
+//Client data, buffers, state (NICK/USER/PASS)
