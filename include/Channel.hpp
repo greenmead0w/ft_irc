@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include "Client.hpp"
 
 class Client;
 
