@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <sys/socket.h>
 #include "Client.hpp"
 
 class Client;
@@ -50,12 +51,17 @@ public:
 	void		setPassword(const std::string &pwd);
 	void		setLimit(size_t	limit);
 	void		setInviteOnly(bool state);
-	void		setTopicRestrocted (bool state);
+	void		setTopicRestricted (bool state);
 
-	// Clients
+	// Manage Clients
 	void	addClient(Client* client);
 	void	removeClient(int fd);
 	bool	isClientInChannel(int fd) const;
+
+	// Manage Operators
+	void	addOperator(int fd);
+	void	removeOperator(int fd);
+	bool	isOperator(int fd) const;
 
 	// COM
 	void	broadcast(const std::string &message, int excludeFd = -1);

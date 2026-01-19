@@ -4,6 +4,7 @@
 
 Channel::Channel() :
 	_name(""),
+	_topic(""),
 	_userLimit(0),
 	_modeInviteOnly(false),
 	_modeTopicRestricted(true),
@@ -12,6 +13,7 @@ Channel::Channel() :
 
 Channel::Channel(std::string name) :
 	_name(name),
+	_topic(""),
 	_userLimit(0),
 	_modeInviteOnly(false),
 	_modeTopicRestricted(true),
@@ -50,6 +52,65 @@ Channel &Channel::operator=(const Channel &copy) {
 
 // Management
 
-void	Channel::addClient(Client* client);
-void	Channel::removeClient(int fd);
-bool	Channel::isClientInChannel(int fd) const;
+void	Channel::addClient(Client* client) {
+	if (client)
+		_clients[client->getFd()] = client;
+}
+
+// Delete client from channel and also from operators list
+void	Channel::removeClient(int fd) {
+	_clients.erase(fd);
+	_operators.erase(fd);
+}
+
+bool	Channel::isClientInChannel(int fd) const {
+	return _clients.find(fd) != _clients.end();
+}
+
+void	Channel::addOperator(int fd) {
+	_operators.insert(fd);
+}
+
+void	Channel::removeOperator(int fd) {
+	_operators.erase(fd);
+}
+
+bool	Channel::isOperator(int fd) const {
+	return _operators.find(fd) != _operators.end();
+}
+
+// Getters
+std::string	Channel::getName() const { return _name; }
+std::string	Channel::getTopic() const { return _topic; }
+std::string	Channel::getPassword() const { return _password; }
+size_t		Channel::getLimit() const { return _userLimit; }
+size_t		Channel::getUserCount() const { return _clients.size(); }
+
+bool		Channel::isInviteOnly() const { return _modeInviteOnly; }
+bool		Channel::isTopicRestricted() const { return _modeTopicRestricted; }
+bool		Channel::hasPassword() const { return _hasPassword; }
+bool		Channel::hasLimit() const { return _hasLimit; }
+
+// Setters
+void		Channel::setTopic(const std::string &topic) { _topic = topic; }
+void		Channel::setPassword(const std::string &pwd) {
+	_password = pwd;
+	_hasPassword = !pwd.empty();
+}
+void		Channel::setLimit(size_t	limit) {
+	_userLimit = limit;
+	_hasLimit = (limit > 0);
+}
+void		Channel::setInviteOnly(bool state) { _modeInviteOnly = state; }
+void		Channel::setTopicRestricted (bool state) { _modeTopicRestricted = state; }
+
+// COM
+	void	Channel::broadcast(const std::string &message, int excludeFd) {
+		std::map<int, Client*>::iterator it;
+		for (it = _clients.begin(); it != _clients.end(); it++)
+		{
+			if (it->first != excludeFd)
+				send(it->first, message.c_str(), message.length(), 0);
+		}
+	}
+
