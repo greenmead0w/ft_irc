@@ -4,6 +4,66 @@ Command::Command() :
 	_rawLine(""),
 	_cmdName("") {}
 
-Command::Command(const Command &copy);
-Command::Command &operator=(const Command &copy);
-Command::~Command();
+Command::Command(const Command &copy) : 
+	_rawLine(copy._rawLine),
+	_cmdName(copy._cmdName) {}
+
+Command &Command::operator=(const Command &copy) {
+	if (this != &copy) {
+		_rawLine = copy._rawLine;
+		_cmdName = copy._cmdName;
+	}
+	return *this;
+}
+Command::~Command() {}
+
+// Parses a raw command line into a command name and its params
+void Command::parse(const std::string &line) {
+	this->_rawLine = line;
+	std::string trimmed = line;
+
+	// first clean spaces and line breaks
+	size_t	first = trimmed.find_first_not_of("\n\r\t");
+	if (first == std::string::npos)
+		return ;
+	size_t	last = trimmed.find_last_not_of("\n\r\t");
+	trimmed = trimmed.substr(first, (last - first + 1));
+
+	// extact the command
+	size_t	space_pos = trimmed.find(' ');
+	if (space_pos == std::string::npos) {
+		this->_cmdName = trimmed;
+		return ;
+	}
+	this->_cmdName = trimmed.substr(0, space_pos);
+	std::string remaining = trimmed.substr(space_pos + 1);
+
+	// extract params
+	while (!remaining.empty()) {
+		size_t	start = remaining.find_first_not_of(' ');
+		if (start == std::string::npos)
+			break;
+		remaining = remaining.substr(start);
+
+		// if starts from ':' the remain is only 1 parameter
+		if (remaining[0] == ':') {
+			this->_params.push_back(remaining.substr(1));
+			break;
+		}
+		// if there are not more spaces, remaining is the last parameter.
+		size_t next_space = remaining.find(' ');
+		if (next_space == std::string::npos) {
+			this->_params.push_back(remaining);
+			break;
+		} else {
+			this->_params.push_back(remaining.substr(0, next_space));
+			remaining = remaining.substr(next_space + 1);
+		}
+	}
+}
+
+void Command::execute(Client* client, Server* server) {
+	//TODO: first we need NICK & PASS done.
+}
+
+std::string	Command::getCmdName() const { return _cmdName; }
