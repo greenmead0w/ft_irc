@@ -1,5 +1,5 @@
 #ifndef CHANNEL_HPP
-#define CHANEL_HPP
+#define CHANNEL_HPP
 
 #include <string>
 #include <vector>
