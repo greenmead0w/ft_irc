@@ -23,6 +23,9 @@ public:
 	void execute(Client* client, Server* server);
 
 	std::string	getCmdName() const;
+
+	// command executions:
+	void	executePASS(Client* client, Server* server);
 };
 
 #endif

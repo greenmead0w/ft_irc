@@ -61,3 +61,6 @@ void Server::run() {
             throw std::runtime_error("Poll failed");
     }
 }
+
+// Getters:
+std::string	Server::getPassword() const { return _password; }

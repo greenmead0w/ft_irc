@@ -30,6 +30,9 @@ public:
 
     void init(); // The Setup
     void run();  // The Loop
+
+	// Getters
+	std::string	getPassword() const;
 };
 
 #endif

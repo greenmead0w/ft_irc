@@ -66,9 +66,9 @@ void	Client::setRealname(const std::string &real) { _realname = real; }
 void	Client::setHostname(const std::string &host){ _hostname = host; }
 void	Client::setIP(const std::string &ip){ _clientIP = ip; }
 
-void	Client::setEnteredPassword(bool &state){ _hasEnteredPassword = state; }
-void	Client::setFullyRegistered(bool &state){ _isFullyRegistered = state; }
-void	Client::setGlobalOperator(bool &state){ _isGlobalOperator = state; }
+void	Client::setEnteredPassword(bool state){ _hasEnteredPassword = state; }
+void	Client::setFullyRegistered(bool state){ _isFullyRegistered = state; }
+void	Client::setGlobalOperator(bool state){ _isGlobalOperator = state; }
 
 // Logic methods
 

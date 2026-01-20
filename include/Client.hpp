@@ -52,9 +52,9 @@ public:
 	void	setHostname(const std::string &host);
 	void	setIP(const std::string &ip);
 
-	void	setEnteredPassword(bool &state);
-	void	setFullyRegistered(bool &state);
-	void	setGlobalOperator(bool &state);
+	void	setEnteredPassword(bool state);
+	void	setFullyRegistered(bool state);
+	void	setGlobalOperator(bool state);
 
 	/* Logic methods */
 	// Buffer
