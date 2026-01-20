@@ -81,6 +81,25 @@ void	Client::clearBuffer() {
 	_incomingBuffer.clear();
 }
 
+/*	uses appendToBuffer() to get first complete command from buffer,
+	removes it and leaves remaining data there
+	
+	IRC commands end in "\n" or "\r\n"*/
+std::string Client::getNextCommand() {
+    size_t pos = _incomingBuffer.find("\n"); 
+    if (pos == std::string::npos)
+        return "";
+
+    std::string cmd = _incomingBuffer.substr(0, pos);
+    _incomingBuffer.erase(0, pos + 1); // Remove the command and the \n
+    
+    // Clean up \r if it exists (otherwise we will have problems in parsing)
+    if (!cmd.empty() && cmd[cmd.size() - 1] == '\r')
+        cmd.erase(cmd.size() - 1);
+        
+    return cmd;
+}
+
 void	Client::addInvite(const std::string &channelName) {
 	_invitedTo.insert(channelName);
 }
