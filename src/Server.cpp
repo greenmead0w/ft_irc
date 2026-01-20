@@ -51,40 +51,6 @@ void Server::init() {
     _fds.push_back(serverPollFd);
 }
 
-
-void Server::acceptNewConnection() {
-    struct sockaddr_in clientAddr;
-    socklen_t clientAddrLen = sizeof(clientAddr);
-
-    // 1. Accept the connection
-    int clientFd = accept(_serverFd, (struct sockaddr *)&clientAddr, &clientAddrLen);
-    if (clientFd < 0) {
-        std::cerr << "Error: accept() failed" << std::endl;
-        return;
-    }
-
-    // 2. Set the new socket to Non-Blocking
-    if (fcntl(clientFd, F_SETFL, O_NONBLOCK) < 0) {
-        std::cerr << "Error: fcntl() failed on new client" << std::endl;
-        close(clientFd);
-        return;
-    }
-
-    // 3. Register the new FD for poll()
-    struct pollfd clientPollFd;
-    clientPollFd.fd = clientFd;
-    clientPollFd.events = POLLIN;
-    clientPollFd.revents = 0;
-    _fds.push_back(clientPollFd);
-
-    // 4. Create the Client object and store their IP
-    Client newClient(clientFd);
-    newClient.setIP(inet_ntoa(clientAddr.sin_addr));
-    _clients.insert(std::make_pair(clientFd, newClient));
-
-    std::cout << "[Server] New connection from " << newClient.getIP() << " on FD " << clientFd << std::endl;
-}
-
 // Minimal run() just to keep the program alive for testing
 void Server::run() {
     extern bool g_stop; // From main.cpp

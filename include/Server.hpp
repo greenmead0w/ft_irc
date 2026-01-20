@@ -11,8 +11,6 @@
 #include <unistd.h>     // For close()
 #include <vector>
 #include <errno.h>
-#include <arpa/inet.h> // For inet_ntoa
-
 
 class Server {
 private:
@@ -20,19 +18,11 @@ private:
     std::string                 _password;
     int                         _serverFd;      //listening socket
     std::vector<struct pollfd>  _fds;           //efficient multi-socket activity monitor
-    std::map<int, Client>       _clients;       //Map FDs to Client objects
 
     // Forbidden Orthodox Canonical forms for now
     Server();
     Server(const Server &copy);
     Server &operator=(const Server &copy);
-
-    //connection manager functions
-    void acceptNewConnection();     // Helper for accept()
-    void handleClientData(int fd);  // Helper for recv()
-    void removeClient(int fd);      // Helper for disconnect
-
-
 
 public:
     Server(int port, std::string password);

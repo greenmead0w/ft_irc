@@ -60,7 +60,6 @@ public:
 	// Buffer
 	void	appendToBuffer(const std::string &data);
 	void	clearBuffer();
-	std::string	getNextCommand(); //like gnl but for entire cmds
 	
 	// Invitations
 	void	addInvite(const std::string &channelName);
