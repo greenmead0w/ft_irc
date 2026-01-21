@@ -60,6 +60,7 @@ public:
 	// Buffer
 	void	appendToBuffer(const std::string &data);
 	void	clearBuffer();
+	std::string getNextCommand();
 	
 	// Invitations
 	void	addInvite(const std::string &channelName);
