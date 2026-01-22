@@ -3,6 +3,8 @@
 #include "Server.hpp"
 
 void	Command::executeUSER(Client* client, Server* server) {
+	// We don't use server param, but let it here in case of future implementation.
+	(void)server;
 
 	if (!client->hasEnteredPassword()) {
 		// ERR_NOTREGISTERED	

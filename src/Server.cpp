@@ -122,11 +122,18 @@ void Server::removeClient(int fd) {
     close(fd);
 }
 
-/* TO BE DONE: pass the cmd to the command parser logic*/
-void Server::processCommand(int fd, std::string cmd) {
-    // This is where you pass the string to your colleague's parser.
-    std::cout << "[DEBUG] Received from FD " << fd << ": [" << cmd << "]" << std::endl;
-    
+// Pass the cmd to the command parser logic*/
+void Server::processCommand(int fd, std::string cmdLine) {
+	//Debugging:
+    std::cout << "[DEBUG] Received from FD " << fd << ": [" << cmdLine << "]" << std::endl;
+    Client* client = _clients[fd];
+	if (!client)
+		return ;
+	
+	Command cmd;
+	cmd.parse(cmdLine);
+
+	cmd.execute(client, this);
 }
 
 

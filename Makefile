@@ -7,8 +7,16 @@ SRC_DIR     = src/
 OBJ_DIR     = obj/
 
 #Add files here as we create them
-FILES       = main.cpp Server.cpp Client.cpp Channel.cpp #more to be added 
-COMMANDS    = PASS.cpp NICK.cpp USER.cpp JOIN.cpp #more to be added
+FILES       = main.cpp \
+				Server.cpp \
+				Client.cpp 	\
+				Channel.cpp \
+
+COMMANDS    = Command.cpp \
+				PASS.cpp \
+				NICK.cpp \
+				USER.cpp \
+				JOIN.cpp \
 
 #Constructing file paths
 SRCS        = $(addprefix $(SRC_DIR), $(FILES)) \

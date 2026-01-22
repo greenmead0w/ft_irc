@@ -1,4 +1,5 @@
 #include "Command.hpp"
+#include "Server.hpp"
 
 Command::Command() : 
 	_rawLine(""),
@@ -63,7 +64,15 @@ void Command::parse(const std::string &line) {
 }
 
 void Command::execute(Client* client, Server* server) {
-	//TODO: first we need NICK & PASS done.
+	if (_cmdName == "PASS") 
+		this->executePASS(client, server);
+	// Only if pass return exit:
+	else if (client->hasEnteredPassword()) {
+		if (_cmdName == "NICK")
+			this->executeNICK(client, server);
+		else if (_cmdName == "USER")
+			this->executeUSER(client, server);
+	}
 }
 
 std::string	Command::getCmdName() const { return _cmdName; }

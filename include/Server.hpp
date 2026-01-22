@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <arpa/inet.h> // for inet_ntoa()
 #include "Client.hpp"
+#include "Command.hpp"
 
 class Server {
 private:
@@ -26,7 +27,7 @@ private:
     void acceptNewConnection(); 
     void handleClientData(int fd);
     void removeClient(int fd);
-    void processCommand(int fd, std::string cmd);
+    void processCommand(int fd, std::string cmdLine);
 
     // Forbidden Orthodox Canonical forms for now
     Server();
