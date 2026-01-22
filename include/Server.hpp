@@ -37,8 +37,9 @@ public:
     Server(int port, std::string password);
     ~Server();
 
-    void init(); // The Setup
-    void run();  // The Loop
+    void init(); //the setup
+    void run();  //the loop
+    void sendResponse(int fd);
 
 	// Getters
 	std::string	getPassword() const;

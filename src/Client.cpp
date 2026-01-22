@@ -104,8 +104,8 @@ void Client::appendOutgoingBuffer(const std::string &msg) {
     _outgoingBuffer += msg;
 }
 
-// Architect Detail: We might only send PART of the buffer, 
-// so we remove only what was actually sent.
+/* We might only send part of the buffer,
+   so we remove only what was sent*/
 void Client::clearOutgoingBuffer(size_t sentBytes) {
     _outgoingBuffer.erase(0, sentBytes);
 }

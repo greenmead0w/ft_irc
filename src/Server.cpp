@@ -87,6 +87,10 @@ void Server::acceptNewConnection() {
     _clients.insert(std::make_pair(clientFd, newClient));
 
     std::cout << "[Server] New connection from " << newClient.getIP() << " on FD " << clientFd << std::endl;
+
+    //TESTING SERVER TO CLIENT COMMUNICATION
+    _clients[clientFd].appendOutgoingBuffer("Welcome to the IRC Server!\r\n");
+    _clients[clientFd].appendOutgoingBuffer("Please enter the PASS to continue.\r\n");
 }
 
 /* removes client from array of pollfds and table of client fds
@@ -143,22 +147,61 @@ void Server::handleClientData(int fd) {
     }
 }
 
-// Minimal run() just to keep the program alive for testing
+/* sends data to appropriate client, removes sent data from buffer
+   or finalizes if send errors not for full buffer reasons*/
+void Server::sendResponse(int fd) {
+
+    std::string &buffer = _clients[fd].getOutgoingBuffer();
+    if (buffer.empty()) return;
+
+    // We try to send the whole buffer
+    int bytesSent = send(fd, buffer.c_str(), buffer.size(), 0);
+
+    if (bytesSent > 0) {
+        //remove sent data from the buffer
+        _clients[fd].clearOutgoingBuffer(bytesSent);
+    } else if (bytesSent == -1) {
+        //EAGAIN, EWOULDBLOCK signal send not possible 
+        //in that case we just wait for the next loop iteration
+        if (errno != EWOULDBLOCK && errno != EAGAIN) {
+            std::cerr << "Error: send() failed on FD " << fd << std::endl;
+            removeClient(fd);
+        }
+    }
+}
+
+
 void Server::run() {
     extern bool g_stop; // From main.cpp
     std::cout << "Server is listening on port " << _port << "..." << std::endl;
 
     while (g_stop == false) {
+
+        //for every client, tell poll() to check for available sockets to write 
+        // only if theres data to send
+        for (size_t i = 1; i < _fds.size(); i++) {
+            if (!_clients[_fds[i].fd].getOutgoingBuffer().empty())
+                _fds[i].events |= POLLOUT; 
+            else
+                _fds[i].events &= ~POLLOUT; //turn off pollout, avoids hammering CPU (because sockets are almost always writable)
+        }
+
         // -1 means wait indefinitely for a signal or data
         if (poll(&_fds[0], _fds.size(), -1) < 0 && g_stop == false)
             break;
 
+        //logic to handle POLLIN and/or POLLOUT
         for (size_t i = 0; i < _fds.size(); i++) {
             if (_fds[i].revents & POLLIN) {
                 if (_fds[i].fd == _serverFd)
-                    acceptNewConnection(); // It's a new person
+                    acceptNewConnection(); //it's a new client
                 else
-                    handleClientData(_fds[i].fd); // It's an existing person
+                    handleClientData(_fds[i].fd); //existing client
+            }
+
+            //handle writting to client
+            if (_fds[i].revents & POLLOUT) {
+                sendResponse(_fds[i].fd);
             }
         }
     }
