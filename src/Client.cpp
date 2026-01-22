@@ -53,7 +53,8 @@ std::string Client::getNickname() const { return _nickname; }
 std::string Client::getRealname() const { return _realname; }
 std::string Client::getHostname() const { return _hostname; }
 std::string Client::getIP() const { return _clientIP; }
-std::string Client::getBuffer() const { return _incomingBuffer; }
+std::string Client::getIncomingBuffer() const { return _incomingBuffer; }
+std::string &Client::getOutgoingBuffer() { return _outgoingBuffer; }
 
 bool	Client::hasEnteredPassword() const { return _hasEnteredPassword; }
 bool	Client::isFullyRegistered() const { return _isFullyRegistered; }
@@ -73,12 +74,40 @@ void	Client::setGlobalOperator(bool state){ _isGlobalOperator = state; }
 // Logic methods
 
 //Reconstruct partial commands, when CTRL+D
-void	Client::appendToBuffer(const std::string &data) {
+void	Client::appendIncomingBuffer(const std::string &data) {
 	_incomingBuffer += data;
 }
 
-void	Client::clearBuffer() {
+void	Client::clearIncomingBuffer() {
 	_incomingBuffer.clear();
+}
+
+/* called by server to see if full message / cmd has been sent
+   returns "" if buffer is empty or holds partial cmd
+   cleans buffer up to \n */
+std::string Client::getNextCommand() {
+    size_t pos = _incomingBuffer.find("\n");
+    if (pos == std::string::npos)
+        return "";
+
+    std::string cmd = _incomingBuffer.substr(0, pos);
+    _incomingBuffer.erase(0, pos + 1);
+    
+    //Cleans \r if it exists (for \r\n endings)
+    if (!cmd.empty() && cmd[cmd.size() - 1] == '\r')
+        cmd.erase(cmd.size() - 1);
+        
+    return cmd;
+}
+
+void Client::appendOutgoingBuffer(const std::string &msg) {
+    _outgoingBuffer += msg;
+}
+
+/* We might only send part of the buffer,
+   so we remove only what was sent*/
+void Client::clearOutgoingBuffer(size_t sentBytes) {
+    _outgoingBuffer.erase(0, sentBytes);
 }
 
 void	Client::addInvite(const std::string &channelName) {

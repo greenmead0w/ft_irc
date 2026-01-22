@@ -18,7 +18,8 @@ private:
 	bool		_isFullyRegistered;
 
 	// Network management
-	std::string	_incomingBuffer;
+	std::string	_incomingBuffer; //relative to server, what client sends
+	std::string _outgoingBuffer; //data waiting to be sent to client
 	std::string	_clientIP;
 
 	// Permission & security
@@ -39,7 +40,8 @@ public:
 	std::string getRealname() const;
 	std::string getHostname() const;
 	std::string getIP() const;
-	std::string getBuffer() const;
+	std::string getIncomingBuffer() const;
+	std::string &getOutgoingBuffer();
 
 	bool	hasEnteredPassword() const;
 	bool	isFullyRegistered() const;
@@ -57,9 +59,14 @@ public:
 	void	setGlobalOperator(bool state);
 
 	/* Logic methods */
-	// Buffer
-	void	appendToBuffer(const std::string &data);
-	void	clearBuffer();
+	// incomingBuffer
+	void	appendIncomingBuffer(const std::string &data);
+	void	clearIncomingBuffer();
+	std::string getNextCommand();
+
+	//outgoingBuffer
+	void        appendOutgoingBuffer(const std::string &msg);
+    void        clearOutgoingBuffer(size_t sentBytes);
 	
 	// Invitations
 	void	addInvite(const std::string &channelName);
