@@ -82,15 +82,15 @@ void Server::acceptNewConnection() {
     _fds.push_back(clientPollFd);
 
     //create the client object, get their IP and add to the client table
-    Client newClient(clientFd);
-    newClient.setIP(inet_ntoa(clientAddr.sin_addr));
-    _clients.insert(std::make_pair(clientFd, newClient));
+    Client* newClient = new Client(clientFd);
+    newClient->setIP(inet_ntoa(clientAddr.sin_addr));
+    _clients[clientFd] = newClient;
 
-    std::cout << "[Server] New connection from " << newClient.getIP() << " on FD " << clientFd << std::endl;
+    std::cout << "[Server] New connection from " << newClient->getIP() << " on FD " << clientFd << std::endl;
 
     //TESTING SERVER TO CLIENT COMMUNICATION
-    _clients[clientFd].appendOutgoingBuffer("Welcome to the IRC Server!\r\n");
-    _clients[clientFd].appendOutgoingBuffer("Please enter the PASS to continue.\r\n");
+    _clients[clientFd]->appendOutgoingBuffer("Welcome to the IRC Server!\r\n");
+    _clients[clientFd]->appendOutgoingBuffer("Please enter the PASS to continue.\r\n");
 }
 
 /* removes client from array of pollfds and table of client fds
@@ -137,11 +137,11 @@ void Server::handleClientData(int fd) {
         removeClient(fd);
     } else {
         //add data to the client's internal buffer
-        _clients[fd].appendIncomingBuffer(buffer);
+        _clients[fd]->appendIncomingBuffer(buffer);
 
         std::string cmd;
         //loop keeps running while there's a full cmd to process
-        while (!(cmd = _clients[fd].getNextCommand()).empty()) {
+        while (!(cmd = _clients[fd]->getNextCommand()).empty()) {
             processCommand(fd, cmd);
         }
     }
@@ -151,7 +151,7 @@ void Server::handleClientData(int fd) {
    or finalizes if send errors not for full buffer reasons*/
 void Server::sendResponse(int fd) {
 
-    std::string &buffer = _clients[fd].getOutgoingBuffer();
+    std::string &buffer = _clients[fd]->getOutgoingBuffer();
     if (buffer.empty()) return;
 
     // We try to send the whole buffer
@@ -159,7 +159,7 @@ void Server::sendResponse(int fd) {
 
     if (bytesSent > 0) {
         //remove sent data from the buffer
-        _clients[fd].clearOutgoingBuffer(bytesSent);
+        _clients[fd]->clearOutgoingBuffer(bytesSent);
     } else if (bytesSent == -1) {
         //EAGAIN, EWOULDBLOCK signal send not possible 
         //in that case we just wait for the next loop iteration
@@ -180,7 +180,7 @@ void Server::run() {
         //for every client, tell poll() to check for available sockets to write 
         // only if theres data to send
         for (size_t i = 1; i < _fds.size(); i++) {
-            if (!_clients[_fds[i].fd].getOutgoingBuffer().empty())
+            if (!_clients[_fds[i].fd]->getOutgoingBuffer().empty())
                 _fds[i].events |= POLLOUT; 
             else
                 _fds[i].events &= ~POLLOUT; //turn off pollout, avoids hammering CPU (because sockets are almost always writable)
