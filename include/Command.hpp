@@ -26,6 +26,7 @@ public:
 
 	// command executions:
 	void	executePASS(Client* client, Server* server);
+	void	executeNICK(Client* client, Server* server);
 };
 
 #endif
