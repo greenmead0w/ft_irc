@@ -21,7 +21,7 @@ private:
     std::string                 _password;
     int                         _serverFd;      //listening socket
     std::vector<struct pollfd>  _fds;           //efficient multi-socket activity monitor
-    std::map<int, Client>       _clients;       //table of client objects
+    std::map<int, Client*>       _clients;       //table of client objects
 
     void acceptNewConnection(); 
     void handleClientData(int fd);
