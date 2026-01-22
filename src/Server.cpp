@@ -133,7 +133,7 @@ void Server::handleClientData(int fd) {
         removeClient(fd);
     } else {
         //add data to the client's internal buffer
-        _clients[fd].appendToBuffer(buffer);
+        _clients[fd].appendIncomingBuffer(buffer);
 
         std::string cmd;
         //loop keeps running while there's a full cmd to process

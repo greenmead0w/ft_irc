@@ -23,7 +23,7 @@ private:
     std::vector<struct pollfd>  _fds;           //efficient multi-socket activity monitor
     std::map<int, Client>       _clients;       //table of client objects
 
-    void acceptNewConnection(); //only server should call it 
+    void acceptNewConnection(); 
     void handleClientData(int fd);
     void removeClient(int fd);
     void processCommand(int fd, std::string cmd);
