@@ -43,6 +43,7 @@ public:
 
 	// Getters
 	std::string	getPassword() const;
+	Client*		getClientByNickname(const std::string& nickname);
 };
 
 #endif

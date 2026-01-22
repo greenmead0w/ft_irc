@@ -10,6 +10,15 @@ Server::~Server() {
 // Getters:
 std::string	Server::getPassword() const { return _password; }
 
+Client*		Server::getClientByNickname(const std::string& nickname) {
+	std::map<int, Client*>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); ++it) {
+		if (it->second->getNickname() == nickname)
+			return it->second;
+	}
+	return NULL;
+}
+
 /* Initializes the IRC server's listening socket: creates an IPv4 TCP socket, 
 enables port reuse and non-blocking I/O, binds it to all network interfaces 
 on the specified port, and begins listening for client connections */

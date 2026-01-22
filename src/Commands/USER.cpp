@@ -1,0 +1,38 @@
+
+#include "Command.hpp"
+#include "Server.hpp"
+
+void	Command::executeUSER(Client* client, Server* server) {
+
+	if (!client->hasEnteredPassword()) {
+		// ERR_NOTREGISTERED	
+		std::string	msg = ":ircserv 451 * :User not registered\r\n";
+        send(client->getFd(), msg.c_str(), msg.length(), 0);
+        return;
+	}
+
+	//Avoid double register
+	if (client->isFullyRegistered()) {
+		//ERR_ALREADYREGISTERED
+		std::string	msg = ":ircserv 462 :Already registered\r\n";
+        send(client->getFd(), msg.c_str(), msg.length(), 0);
+        return;
+	}
+
+	if (this->_params.size() < 4) {
+		// ERR_NEEDMOREPARAMS	
+		std::string	msg = ":ircserv 461 :Not enough parameters\r\n";
+        send(client->getFd(), msg.c_str(), msg.length(), 0);
+        return;
+	}
+
+	client->setUsername(_params[0]);
+	client->setRealname(_params[3]);
+
+	if (!client->getNickname().empty()) {
+		client->setFullyRegistered(true);
+
+		std::string	msg = ":ircserv 001 " + client->getNickname() + "  :Welcome to our IRC server :D\r\n";
+		send(client->getFd(), msg.c_str(), msg.length(), 0);
+	}
+}
