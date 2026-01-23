@@ -105,12 +105,14 @@ void		Channel::setInviteOnly(bool state) { _modeInviteOnly = state; }
 void		Channel::setTopicRestricted (bool state) { _modeTopicRestricted = state; }
 
 // COM
-	void	Channel::broadcast(const std::string &message, int excludeFd) {
-		std::map<int, Client*>::iterator it;
-		for (it = _clients.begin(); it != _clients.end(); it++)
-		{
-			if (it->first != excludeFd)
-				send(it->first, message.c_str(), message.length(), 0);
-		}
+void	Channel::broadcast(const std::string &message, Server* server, int excludeFd) {
+	std::map<int, Client*>::iterator it;
+	for (it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->first != excludeFd)
+			server->sendReply(it->first, message);
+			//send(it->first, message.c_str(), message.length(), 0);
+
 	}
+}
 

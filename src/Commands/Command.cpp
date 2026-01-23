@@ -72,6 +72,8 @@ void Command::execute(Client* client, Server* server) {
 			this->executeNICK(client, server);
 		else if (_cmdName == "USER")
 			this->executeUSER(client, server);
+		else if (_cmdName == "PRIVMSG")
+            this->executePRIVMSG(client, server);
 	}
 }
 

@@ -10,7 +10,8 @@ void	Command::executePASS(Client* client, Server* server) {
 	if (this->_params.empty()) {
 		// error 461: ERR_NEEDMOREPARAMS
 		std::string	msg = ":ircserv 461 " + client->getNickname() + " PASS :Not Enough Parameters\r\n";
-		send(client->getFd(), msg.c_str(), msg.length(), 0);
+		//send(client->getFd(), msg.c_str(), msg.length(), 0);
+		server->sendReply(client->getFd(), msg);
 		return ;
 	}
 
@@ -19,7 +20,8 @@ void	Command::executePASS(Client* client, Server* server) {
 	} else {
 		// error 464: ERR_PASSWDMISMATCH
 		std::string	msg = ":ircserv 464 " + client->getNickname() + " :Password incorrect\r\n";
-		send(client->getFd(), msg.c_str(), msg.length(), 0);
+		//send(client->getFd(), msg.c_str(), msg.length(), 0);
+		server->sendReply(client->getFd(), msg);
 		client->setEnteredPassword(false);
 	}
 }

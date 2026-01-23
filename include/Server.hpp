@@ -42,6 +42,10 @@ public:
     void run();  //the loop
     void sendResponse(int fd);
 
+    // Helpers
+    void sendReply(int fd, const std::string& msg);
+    std::string formatPrivmsg(Client* sender, const std::string& target, const std::string& text);
+
 	// Getters
 	std::string	getPassword() const;
 	Client*		getClientByNickname(const std::string& nickname);
