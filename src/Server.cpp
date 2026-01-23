@@ -3,7 +3,16 @@
 Server::Server(int port, std::string password) : _port(port), _password(password), _serverFd(-1) {}
 
 Server::~Server() {
-    if (_serverFd != -1)
+
+    //delete every client from memory
+    std::map<int, Client*>::iterator it;
+    for (it = _clients.begin(); it != _clients.end(); ++it) {
+        delete it->second;
+    }
+
+    _clients.clear();
+
+    if (_serverFd != -1) 
         close(_serverFd);
 }
 
@@ -18,6 +27,26 @@ Client*		Server::getClientByNickname(const std::string& nickname) {
 	}
 	return NULL;
 }
+
+//HELPERS
+
+/* puts the message the server will send to the client
+   in the _outgoingBuffer variable of the client*/
+void Server::sendReply(int fd, const std::string& msg) {
+    Client* client = _clients[fd];
+    if (client) {
+        client->appendOutgoingBuffer(msg);
+    }
+}
+
+//priv message format is: :SenderNick!User@IP PRIVMSG Target :Message
+std::string Server::formatPrivmsg(Client* sender, const std::string& target, const std::string& text) {
+    
+    return ":" + sender->getNickname() + "!" + sender->getUsername() + "@" + sender->getIP() 
+           + " PRIVMSG " + target + " :" + text + "\r\n";
+}
+
+
 
 /* Initializes the IRC server's listening socket: creates an IPv4 TCP socket, 
 enables port reuse and non-blocking I/O, binds it to all network interfaces 
@@ -115,8 +144,11 @@ void Server::removeClient(int fd) {
         }
     }
 
-    //remove from fd-to-client map
-    _clients.erase(fd);
+    //free memory + remove client from map
+     if (_clients.count(fd)) {
+        delete _clients[fd];
+        _clients.erase(fd);
+    }
 
     //close the FD
     close(fd);
