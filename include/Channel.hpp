@@ -7,6 +7,7 @@
 #include <set>
 #include <sys/socket.h>
 #include "Client.hpp"
+#include "Server.hpp"
 
 class Client;
 
@@ -64,7 +65,7 @@ public:
 	bool	isOperator(int fd) const;
 
 	// COM
-	void	broadcast(const std::string &message, Server* server, int excludeFd = -1)
+	void	broadcast(const std::string &message, Server* server, int excludeFd = -1);
 
 };
 
