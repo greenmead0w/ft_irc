@@ -6,15 +6,15 @@ Server::~Server() {
 
     //delete every client from memory
     std::map<int, Client*>::iterator itC;
-    for (itC = _clients.begin(); itC != _clients.end(); ++itC) {
+    for (itC = _clients.begin(); itC != _clients.end(); ++itC) 
         delete itC->second;
-    }
     _clients.clear();
 
 	//Clear all channels on destructor
 	std::map<std::string, Channel*>::iterator itCh;
-	for (itCh = _channels.begin(); itCh != _channels.end(); itCh++);
+	for (itCh = _channels.begin(); itCh != _channels.end(); ++itCh)
 		delete itCh->second;
+	_channels.clear();
 	
 	//Close main socket
 	if (_serverFd != -1)

@@ -1,4 +1,6 @@
 #include "Channel.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 #include <iostream>
 
 
@@ -90,6 +92,8 @@ bool		Channel::isInviteOnly() const { return _modeInviteOnly; }
 bool		Channel::isTopicRestricted() const { return _modeTopicRestricted; }
 bool		Channel::hasPassword() const { return _hasPassword; }
 bool		Channel::hasLimit() const { return _hasLimit; }
+
+const	std::map<int, Client*>& Channel::getClients() const { return _clients; }
 
 // Setters
 void		Channel::setTopic(const std::string &topic) { _topic = topic; }

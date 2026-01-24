@@ -6,10 +6,9 @@
 #include <map>
 #include <set>
 #include <sys/socket.h>
-#include "Client.hpp"
-#include "Server.hpp"
 
 class Client;
+class Server;
 
 class Channel {
 private:
@@ -46,6 +45,8 @@ public:
 	bool		isTopicRestricted() const;
 	bool		hasPassword() const;
 	bool		hasLimit() const;
+
+	const	std::map<int, Client*>& getClients() const;
 
 	// Setters
 	void		setTopic(const std::string &topic);
