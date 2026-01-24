@@ -15,14 +15,16 @@
 #include <arpa/inet.h> // for inet_ntoa()
 #include "Client.hpp"
 #include "Command.hpp"
+#include "Channel.hpp"
 
 class Server {
 private:
-    int                         _port;
-    std::string                 _password;
-    int                         _serverFd;      //listening socket
-    std::vector<struct pollfd>  _fds;           //efficient multi-socket activity monitor
-    std::map<int, Client*>       _clients;       //table of client objects
+    int								_port;
+    std::string						_password;
+    int								_serverFd;      //listening socket
+    std::vector<struct pollfd>	 	_fds;           //efficient multi-socket activity monitor
+    std::map<int, Client*>      	_clients;       //table of client objects
+	std::map<std::string, Channel*>	_channels;		// channels in the server
 
     void acceptNewConnection(); 
     void handleClientData(int fd);
@@ -49,6 +51,10 @@ public:
 	// Getters
 	std::string	getPassword() const;
 	Client*		getClientByNickname(const std::string& nickname);
+	Channel*	getChannelByName(const std::string& name);
+
+	// Channel
+	void		addChannel(const std::string&	name, Channel* chan);
 };
 
 #endif

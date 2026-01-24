@@ -5,15 +5,20 @@ Server::Server(int port, std::string password) : _port(port), _password(password
 Server::~Server() {
 
     //delete every client from memory
-    std::map<int, Client*>::iterator it;
-    for (it = _clients.begin(); it != _clients.end(); ++it) {
-        delete it->second;
+    std::map<int, Client*>::iterator itC;
+    for (itC = _clients.begin(); itC != _clients.end(); ++itC) {
+        delete itC->second;
     }
-
     _clients.clear();
 
-    if (_serverFd != -1) 
-        close(_serverFd);
+	//Clear all channels on destructor
+	std::map<std::string, Channel*>::iterator itCh;
+	for (itCh = _channels.begin(); itCh != _channels.end(); itCh++);
+		delete itCh->second;
+	
+	//Close main socket
+	if (_serverFd != -1)
+		close(_serverFd);
 }
 
 // Getters:
@@ -218,6 +223,21 @@ void Server::sendResponse(int fd) {
     }
 }
 
+// Channel management:
+
+// Search if a channel exists in the server using its name
+Channel*	Server::getChannelByName(const std::string& name) {
+	std::map<std::string, Channel*>::iterator it = _channels.find(name);
+	if (it != _channels.end())
+		return	it->second;
+	return NULL;
+}
+
+void		Server::addChannel(const std::string&	name, Channel* chan) {
+	//Check if exists to avoid duplicates
+	if(_channels.find(name) == _channels.end())
+		_channels[name] = chan;
+}
 
 void Server::run() {
     extern bool g_stop; // From main.cpp

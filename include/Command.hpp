@@ -28,6 +28,7 @@ public:
 	void	executePASS(Client* client, Server* server);
 	void	executeNICK(Client* client, Server* server);
 	void	executeUSER(Client* client, Server* server);
+	void	executeJOIN(Client* client, Server* server);
 	void	executePRIVMSG(Client* client, Server* server);
 };
 
