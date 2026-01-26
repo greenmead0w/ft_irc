@@ -18,6 +18,7 @@ COMMANDS    = Command.cpp \
 				USER.cpp \
 				JOIN.cpp \
 				PRIVMSG.cpp \
+				PART.cpp \
 
 #Constructing file paths
 SRCS        = $(addprefix $(SRC_DIR), $(FILES)) \

@@ -30,6 +30,7 @@ public:
 	void	executeUSER(Client* client, Server* server);
 	void	executeJOIN(Client* client, Server* server);
 	void	executePRIVMSG(Client* client, Server* server);
+	void	executePART(Client* client, Server* server);
 };
 
 #endif

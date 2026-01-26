@@ -136,10 +136,25 @@ void Server::acceptNewConnection() {
     _clients[clientFd]->appendOutgoingBuffer("Please enter the PASS to continue.\r\n");
 }
 
-/* removes client from array of pollfds and table of client fds
-   and closes the FD */
+/* removes client from 1) channels 2)array of pollfds
+   3) map of client FDs and closes the FD */
 void Server::removeClient(int fd) {
     std::cout << "[Server] Client on FD " << fd << " disconnected." << std::endl;
+
+    //remove client from every channel
+    std::map<std::string, Channel*>::iterator it = _channels.begin();
+    while (it != _channels.end()) {
+        it->second->removeClient(fd);
+        
+        //remove channel if empty
+        if (it->second->getUserCount() == 0) {
+            //std::cout << "[Server] Deleting empty channel: " << it->first << std::endl;
+            std::cout << "[Server] Channel " << it->first << " is now empty and has been deleted" << std::endl;
+            delete it->second;
+            _channels.erase(it++); //post-increment important to prevent a dead iterator
+            ++it;
+        }
+    }
 
     //remove from poll() array
     for (size_t i = 0; i < _fds.size(); i++) {
@@ -239,6 +254,21 @@ void		Server::addChannel(const std::string&	name, Channel* chan) {
 		_channels[name] = chan;
 }
 
+// called to delete the channel when it has no clients
+void Server::removeChannel(const std::string& name) {
+
+    std::map<std::string, Channel*>::iterator it = _channels.find(name);
+
+    if (it != _channels.end()) {
+        std::cout << "[Server] Channel " << name << " is now empty and has been deleted" << std::endl;
+        delete it->second;
+        _channels.erase(it);
+    }
+}
+
+
+
+//
 void Server::run() {
     extern bool g_stop; // From main.cpp
     std::cout << "Server is listening on port " << _port << "..." << std::endl;
