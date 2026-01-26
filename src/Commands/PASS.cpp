@@ -17,6 +17,7 @@ void	Command::executePASS(Client* client, Server* server) {
 
 	if (this->_params[0] == server->getPassword()) {
 		client->setEnteredPassword(true);
+		server->sendReply(client->getFd(), ":ircserv NOTICE * :*** Password accepted. Please set your NICK or USER.\r\n");
 	} else {
 		// error 464: ERR_PASSWDMISMATCH
 		std::string	msg = ":ircserv 464 " + client->getNickname() + " :Password incorrect\r\n";

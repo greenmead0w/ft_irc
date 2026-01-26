@@ -35,10 +35,12 @@ void	Command::executeUSER(Client* client, Server* server) {
 	client->setRealname(_params[3]);
 
 	if (!client->getNickname().empty()) {
+		if (!client->isFullyRegistered()) {
 		client->setFullyRegistered(true);
-
-		std::string	msg = ":ircserv 001 " + client->getNickname() + "  :Welcome to our IRC server :D\r\n";
-		//send(client->getFd(), msg.c_str(), msg.length(), 0);
-		server->sendReply(client->getFd(), msg);
+		server->sendReply(client->getFd(), ":ircserv 001 " + client->getNickname() + " :Welcome to our IRC server :D\r\n");
+		}
+	} else {
+		// Informative feedback message:
+		server->sendReply(client->getFd(), ":ircserv NOTICE * :*** Username set. Now please send NICK <nickname> to complete registration.\r\n");
 	}
 }
