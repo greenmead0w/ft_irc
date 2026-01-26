@@ -75,7 +75,9 @@ void Command::execute(Client* client, Server* server) {
 		else if (_cmdName == "PRIVMSG")
             this->executePRIVMSG(client, server);
 		else if (_cmdName == "JOIN")
-            this->executeJOIN(client, server);		
+            this->executeJOIN(client, server);	
+		else if (_cmdName == "PART")
+            this->executePART(client, server);		
 	}
 		
 }

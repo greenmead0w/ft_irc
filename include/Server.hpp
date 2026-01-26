@@ -55,6 +55,7 @@ public:
 
 	// Channel
 	void		addChannel(const std::string&	name, Channel* chan);
+    void        removeChannel(const std::string& name);
 };
 
 #endif
