@@ -2,13 +2,12 @@
 #include "Server.hpp"
 
 
-/* 1) controls if sender is registered and message has required params
-   2) finds the target client, 3) extracts the message, 4) formats the message
-   5) send the message*/
+/* first validate if sender is registered and message has required params,
+   then solve for channel message or private message between clients */
 void Command::executePRIVMSG(Client* client, Server* server) {
 
     if (!client->isFullyRegistered()) {
-        //ERR_NOTREGISTERED
+        //ERR_NOTREGISTERED - 451
         std::string	msg = ":ircserv 451 * :User not registered\r\n";
         server->sendReply(client->getFd(), msg);
         return;
@@ -16,27 +15,52 @@ void Command::executePRIVMSG(Client* client, Server* server) {
 
     //expected params: PRIVMSG <target> :<message>
     if (_params.size() < 2) {
-        //ERR_NORECIPIENT
+        //ERR_NORECIPIENT - 411
         std::string	msg = ":ircserv 411 " + client->getNickname() + " :No recipient given (PRIVMSG)\r\n";
         server->sendReply(client->getFd(), msg);
         return;
     }
 
-    std::string targetNick = _params[0];
-    
-    //find the target client
-    Client* targetClient = server->getClientByNickname(targetNick);
-    
-    if (targetClient == NULL) {
-        //ERR_NOSUCHNICK
-        std::string	msg = ":ircserv 401 " + client->getNickname() + " " + targetNick + " :No such nick\r\n";
-        server->sendReply(client->getFd(), msg);
-        return;
+    std::string target= _params[0];
+
+    if (target[0] == '#'){
+        Channel *chan = server->getChannelByName(target);
+        
+        if (!chan) {
+            //ERR_NOSUCHCHANNEL - 403
+            server->sendReply(client->getFd(), ":ircserv 403 " + client->getNickname() + " " + target + " :No such channel\r\n");
+            return;
+        }
+        
+        if (!chan->isClientInChannel(client->getFd())) {
+            //ERR_CANNOTSENDTOCHAN - 404
+            server->sendReply(client->getFd(), ":ircserv 404 " + client->getNickname() + " " + target + " :Cannot send to channel\r\n");
+            return;
+        }
+
+        // Broadcast to everyone except the sender
+        std::string formatted = ":" + client->getNickname() + " PRIVMSG " + target + " :" + _params[1] + "\r\n";
+        chan->broadcast(formatted, server, client->getFd());
+
     }
 
-    //format the message for the receiver using helper
-    std:: string formatted = server->formatPrivmsg(client, _params[0], _params[1]);
+    else { 
+        //find the target client
+        Client* targetClient = server->getClientByNickname(target);
+        
+        if (targetClient == NULL) {
+            //ERR_NOSUCHNICK
+            std::string	msg = ":ircserv 401 " + client->getNickname() + " " + target + " :No such nick\r\n";
+            server->sendReply(client->getFd(), msg);
+            return;
+        }
 
-    //send message to target
-    server->sendReply(targetClient->getFd(), formatted);
+        //format the message for the receiver using helper
+        std:: string formatted = server->formatPrivmsg(client, _params[0], _params[1]);
+
+        //send message to target
+        server->sendReply(targetClient->getFd(), formatted);
+
+    }
+
 }

@@ -74,7 +74,10 @@ void Command::execute(Client* client, Server* server) {
 			this->executeUSER(client, server);
 		else if (_cmdName == "PRIVMSG")
             this->executePRIVMSG(client, server);
+		else if (_cmdName == "JOIN")
+            this->executeJOIN(client, server);		
 	}
+		
 }
 
 std::string	Command::getCmdName() const { return _cmdName; }

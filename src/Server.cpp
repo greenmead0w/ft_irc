@@ -136,10 +136,16 @@ void Server::acceptNewConnection() {
     _clients[clientFd]->appendOutgoingBuffer("Please enter the PASS to continue.\r\n");
 }
 
-/* removes client from array of pollfds and table of client fds
-   and closes the FD */
+/* removes client from 1) channels 2)array of pollfds
+   3) map of client FDs and closes the FD */
 void Server::removeClient(int fd) {
     std::cout << "[Server] Client on FD " << fd << " disconnected." << std::endl;
+
+    //remove client from every channel
+    std::map<std::string, Channel*>::iterator it;
+    for (it = _channels.begin(); it != _channels.end(); ++it) {
+        it->second->removeClient(fd);
+    }
 
     //remove from poll() array
     for (size_t i = 0; i < _fds.size(); i++) {
