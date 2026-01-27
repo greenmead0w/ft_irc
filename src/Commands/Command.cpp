@@ -80,6 +80,8 @@ void Command::execute(Client* client, Server* server) {
             this->executePART(client, server);		
 		else if (_cmdName == "QUIT")
 			this->executeQUIT(client, server);
+		else if (_cmdName == "KICK")
+			this->executeKICK(client, server);
 	}
 		
 }
