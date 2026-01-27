@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <set>
 #include <string>
 #include <poll.h>       // for struct pollfd
 #include <sys/socket.h> // socket functions
@@ -27,8 +28,7 @@ private:
 	std::map<std::string, Channel*>	_channels;		// channels in the server
 
     void acceptNewConnection(); 
-    void handleClientData(int fd);
-    void removeClient(int fd);
+    int handleClientData(int fd);
     void processCommand(int fd, std::string cmdLine);
 
     // Forbidden Orthodox Canonical forms for now
@@ -42,7 +42,8 @@ public:
 
     void init(); //the setup
     void run();  //the loop
-    void sendResponse(int fd);
+    int sendResponse(int fd);
+    void removeClient(int fd, const std::string& reason = "Disconnected");
 
     // Helpers
     void sendReply(int fd, const std::string& msg);

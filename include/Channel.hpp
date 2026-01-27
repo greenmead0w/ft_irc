@@ -66,7 +66,8 @@ public:
 	bool	isOperator(int fd) const;
 
 	// COM
-	void	broadcast(const std::string &message, Server* server, int excludeFd = -1);
+	// Add <set> if not present
+	void broadcast(const std::string &message, Server* server, int excludeFd = -1, std::set<int>* notified = NULL);
 
 };
 
