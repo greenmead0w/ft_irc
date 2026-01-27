@@ -109,14 +109,27 @@ void		Channel::setInviteOnly(bool state) { _modeInviteOnly = state; }
 void		Channel::setTopicRestricted (bool state) { _modeTopicRestricted = state; }
 
 // COM
-void	Channel::broadcast(const std::string &message, Server* server, int excludeFd) {
-	std::map<int, Client*>::iterator it;
-	for (it = _clients.begin(); it != _clients.end(); it++)
-	{
-		if (it->first != excludeFd)
-			server->sendReply(it->first, message);
-			//send(it->first, message.c_str(), message.length(), 0);
+/* added the notified variable so client doesn't receive duplicate QUIT messages if
+   they share >1 channel with client that is quitting */
+void Channel::broadcast(const std::string &message, Server* server, int excludeFd, std::set<int>* notified) {
 
-	}
+    std::map<int, Client*>::iterator it;
+    for (it = _clients.begin(); it != _clients.end(); it++) {
+        int targetFd = it->first;
+        
+        //skip sender
+        if (targetFd == excludeFd)
+            continue;
+            
+        //checks if client is already in set
+        if (notified && notified->count(targetFd))
+            continue;
+
+        server->sendReply(targetFd, message);
+
+        //add client to notified set
+        if (notified)
+            notified->insert(targetFd);
+    }
 }
 

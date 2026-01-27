@@ -138,13 +138,31 @@ void Server::acceptNewConnection() {
 
 /* removes client from 1) channels 2)array of pollfds
    3) map of client FDs and closes the FD */
-void Server::removeClient(int fd) {
-    std::cout << "[Server] Client on FD " << fd << " disconnected." << std::endl;
+void Server::removeClient(int fd, const std::string& reason) {
+    //std::cout << "[Server] Client on FD " << fd << " disconnected." << std::endl;
 
-    //remove client from every channel
+    //guard clause to prevent double deleting
+    if (_clients.count(fd) == 0)
+        return;
+
+    Client* client = _clients[fd];
+    std::string nick = client->getNickname();
+
+    //format QUIT message for others: ":Nick!User@IP QUIT :reason"
+    std::string quitMsg = ":" + nick + "!" + client->getUsername() + "@" + client->getIP() + " QUIT :" + reason + "\r\n";
+
+    //prevent sending duplicate quit messages if client is in more than 1 shared channel
+    std::set<int> notified;
+    notified.insert(fd);
+
+    //notify clients sharing channels + remove client from every channel
     std::map<std::string, Channel*>::iterator it = _channels.begin();
     while (it != _channels.end()) {
-        it->second->removeClient(fd);
+
+        if (it->second->isClientInChannel(fd)) {
+            it->second->broadcast(quitMsg, this, fd, &notified); //tell other clients from channel someone is quitting
+            it->second->removeClient(fd); //remove quitting client
+        }
         
         //remove channel if empty
         if (it->second->getUserCount() == 0) {
@@ -152,8 +170,8 @@ void Server::removeClient(int fd) {
             std::cout << "[Server] Channel " << it->first << " is now empty and has been deleted" << std::endl;
             delete it->second;
             _channels.erase(it++); //post-increment important to prevent a dead iterator
+        } else
             ++it;
-        }
     }
 
     //remove from poll() array
@@ -165,12 +183,9 @@ void Server::removeClient(int fd) {
     }
 
     //free memory + remove client from map
-     if (_clients.count(fd)) {
-        delete _clients[fd];
-        _clients.erase(fd);
-    }
-
-    //close the FD
+    std::cout << "[Server] " << nick << " (FD " << fd << ") has quit." << std::endl;
+    delete client;
+    _clients.erase(fd);
     close(fd);
 }
 
@@ -191,11 +206,12 @@ void Server::processCommand(int fd, std::string cmdLine) {
 
 /* called when an existing client socket FD triggers a POLLIN event (meaning they sent a message)
    interprets client sent data either by removing if client disconnects or processing a cmd */
-void Server::handleClientData(int fd) {
+int Server::handleClientData(int fd) {
     char buffer[1024];
 
     //clear buffer with 0s (not required)
-    for (int i = 0; i < 1024; i++) buffer[i] = 0;
+    for (int i = 0; i < 1024; i++)
+        buffer[i] = 0;
 
     //read bytes from client and put them in buffer
     int bytesRead = recv(fd, buffer, sizeof(buffer) - 1, 0);
@@ -203,6 +219,7 @@ void Server::handleClientData(int fd) {
     if (bytesRead <= 0) {
         //0 = client disconnects; < 0 error.
         removeClient(fd);
+        return -1;
     } else {
         //add data to the client's internal buffer
         _clients[fd]->appendIncomingBuffer(buffer);
@@ -211,16 +228,25 @@ void Server::handleClientData(int fd) {
         //loop keeps running while there's a full cmd to process
         while (!(cmd = _clients[fd]->getNextCommand()).empty()) {
             processCommand(fd, cmd);
+
+            //if cmd is QUIT then there's no client and function needs to stop
+            if (_clients.find(fd) == _clients.end())
+                return -1;
         }
     }
+    return 0;
 }
 
 /* sends data to appropriate client, removes sent data from buffer
    or finalizes if send errors not for full buffer reasons*/
-void Server::sendResponse(int fd) {
+int Server::sendResponse(int fd) {
+
+    if (_clients.count(fd) == 0)
+        return -1;
 
     std::string &buffer = _clients[fd]->getOutgoingBuffer();
-    if (buffer.empty()) return;
+    if (buffer.empty())
+        return 0;
 
     // We try to send the whole buffer
     int bytesSent = send(fd, buffer.c_str(), buffer.size(), 0);
@@ -228,14 +254,19 @@ void Server::sendResponse(int fd) {
     if (bytesSent > 0) {
         //remove sent data from the buffer
         _clients[fd]->clearOutgoingBuffer(bytesSent);
+        return 0;
     } else if (bytesSent == -1) {
         //EAGAIN, EWOULDBLOCK signal send not possible 
         //in that case we just wait for the next loop iteration
-        if (errno != EWOULDBLOCK && errno != EAGAIN) {
-            std::cerr << "Error: send() failed on FD " << fd << std::endl;
-            removeClient(fd);
-        }
+        if (errno == EWOULDBLOCK || errno == EAGAIN)
+            return 0;
+
+        //bad errors: connection broken
+        std::cerr << "Error: send() failed on FD " << fd << std::endl;
+        removeClient(fd);
+        return -1;
     }
+    return 0;
 }
 
 // Channel management:
@@ -290,16 +321,34 @@ void Server::run() {
 
         //logic to handle POLLIN and/or POLLOUT
         for (size_t i = 0; i < _fds.size(); i++) {
+            
+            //POLLIN = incoming (read)
             if (_fds[i].revents & POLLIN) {
-                if (_fds[i].fd == _serverFd)
-                    acceptNewConnection(); //it's a new client
-                else
-                    handleClientData(_fds[i].fd); //existing client
+                if (_fds[i].fd == _serverFd) {
+                    acceptNewConnection();
+                } else {
+                    if (handleClientData(_fds[i].fd) == -1) {
+                        i--; //decrement index because next client takes the place from the previous client in array
+                        continue; 
+                    }
+                }
             }
 
-            //handle writting to client
-            if (_fds[i].revents & POLLOUT) {
-                sendResponse(_fds[i].fd);
+            //POLLOUT = outgoing (write)--- B. Handle Outgoing (Write) ---
+            /* important: checking 'i < _fds.size()' because the POLLIN block above
+               might have deleted the last element of the array*/
+            if (i < _fds.size() && (_fds[i].revents & POLLOUT)) {
+                if (sendResponse(_fds[i].fd) == -1) {
+                    i--;
+                    continue;
+                }
+            }
+
+            //handle sudden crashes: if socket closes unexpectedly without sending data
+            if (i < _fds.size() && (_fds[i].revents & (POLLERR | POLLHUP))) {
+                removeClient(_fds[i].fd);
+                i--;
+                continue;
             }
         }
     }

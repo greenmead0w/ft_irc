@@ -31,6 +31,7 @@ public:
 	void	executeJOIN(Client* client, Server* server);
 	void	executePRIVMSG(Client* client, Server* server);
 	void	executePART(Client* client, Server* server);
+	void	executeQUIT(Client* client, Server* server);
 };
 
 #endif
