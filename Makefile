@@ -20,6 +20,7 @@ COMMANDS    = Command.cpp \
 				PRIVMSG.cpp \
 				PART.cpp \
 				QUIT.cpp \
+				KICK.cpp \
 
 #Constructing file paths
 SRCS        = $(addprefix $(SRC_DIR), $(FILES)) \
