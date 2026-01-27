@@ -32,6 +32,7 @@ public:
 	void	executePRIVMSG(Client* client, Server* server);
 	void	executePART(Client* client, Server* server);
 	void	executeQUIT(Client* client, Server* server);
+	void	executeKICK(Client* client, Server* server);
 };
 
 #endif
