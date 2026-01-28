@@ -27,6 +27,9 @@ private:
 	std::map<int, Client*>	_clients;
 	std::set<int>			_operators;
 
+	//MODE
+	std::set<int> _invitedFds; //FDs allowed to join when +i is on
+
 public:
 	Channel();
 	Channel(std::string name);
@@ -41,7 +44,7 @@ public:
 	size_t		getLimit() const;
 	size_t		getUserCount() const;
 
-	bool		isInviteOnly() const;
+	bool		isInviteOnlyChannel() const;
 	bool		isTopicRestricted() const;
 	bool		hasPassword() const;
 	bool		hasLimit() const;
@@ -68,6 +71,13 @@ public:
 	// COM
 	// Add <set> if not present
 	void broadcast(const std::string &message, Server* server, int excludeFd = -1, std::set<int>* notified = NULL);
+
+	//MODE
+
+	// Manage Invites
+	void addInvite(int fd);
+    void removeInvite(int fd);
+    bool isInvited(int fd) const;
 
 };
 
