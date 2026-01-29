@@ -88,7 +88,7 @@ std::string	Channel::getPassword() const { return _password; }
 size_t		Channel::getLimit() const { return _userLimit; }
 size_t		Channel::getUserCount() const { return _clients.size(); }
 
-bool		Channel::isInviteOnly() const { return _modeInviteOnly; }
+bool		Channel::isInviteOnlyChannel() const { return _modeInviteOnly; }
 bool		Channel::isTopicRestricted() const { return _modeTopicRestricted; }
 bool		Channel::hasPassword() const { return _hasPassword; }
 bool		Channel::hasLimit() const { return _hasLimit; }
@@ -131,5 +131,20 @@ void Channel::broadcast(const std::string &message, Server* server, int excludeF
         if (notified)
             notified->insert(targetFd);
     }
+}
+
+
+//MODE
+
+void Channel::addInvite(int fd) { 
+	_invitedFds.insert(fd); 
+}
+
+void Channel::removeInvite(int fd) { 
+	_invitedFds.erase(fd); 
+}
+
+bool Channel::isInvited(int fd) const { 
+	return _invitedFds.count(fd); 
 }
 

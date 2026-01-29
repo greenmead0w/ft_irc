@@ -2,8 +2,10 @@
 #define COMMAND_HPP
 
 #include "Client.hpp"
+#include "Channel.hpp"
 #include <string>
 #include <vector>
+
 
 class Server;
 
@@ -12,6 +14,10 @@ private:
 	std::string					_rawLine;
 	std::string					_cmdName;
 	std::vector<std::string>	_params;
+
+	//executeMODE parsing helper
+	bool	applyChannelModes(Server* server, Channel* chan, std::string& appliedModes, std::string& modeParams);
+
 public: 
 	Command();
 	Command(const Command &copy);
@@ -33,6 +39,8 @@ public:
 	void	executePART(Client* client, Server* server);
 	void	executeQUIT(Client* client, Server* server);
 	void	executeKICK(Client* client, Server* server);
+	void	executeMODE(Client* client, Server* server);
+	void	executeINVITE(Client* client, Server* server);
 	void	executeTOPIC(Client* client, Server* server);
 };
 
