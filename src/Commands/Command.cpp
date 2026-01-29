@@ -82,6 +82,8 @@ void Command::execute(Client* client, Server* server) {
 			this->executeQUIT(client, server);
 		else if (_cmdName == "KICK")
 			this->executeKICK(client, server);
+		else if (_cmdName == "TOPIC")
+			this->executeTOPIC(client, server);
 	}
 		
 }

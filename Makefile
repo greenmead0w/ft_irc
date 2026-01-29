@@ -21,6 +21,7 @@ COMMANDS    = Command.cpp \
 				PART.cpp \
 				QUIT.cpp \
 				KICK.cpp \
+				TOPIC.cpp \
 
 #Constructing file paths
 SRCS        = $(addprefix $(SRC_DIR), $(FILES)) \

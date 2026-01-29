@@ -33,6 +33,7 @@ public:
 	void	executePART(Client* client, Server* server);
 	void	executeQUIT(Client* client, Server* server);
 	void	executeKICK(Client* client, Server* server);
+	void	executeTOPIC(Client* client, Server* server);
 };
 
 #endif
