@@ -41,8 +41,7 @@ public:
 	void	executeKICK(Client* client, Server* server);
 	void	executeMODE(Client* client, Server* server);
 	void	executeINVITE(Client* client, Server* server);
-
-
+	void	executeTOPIC(Client* client, Server* server);
 };
 
 #endif
