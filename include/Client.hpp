@@ -16,6 +16,7 @@ private:
 	// Auth states
 	bool		_hasEnteredPassword;
 	bool		_isFullyRegistered;
+	bool		_pendingDisconnect;
 
 	// Network management
 	std::string	_incomingBuffer; //relative to server, what client sends
@@ -46,6 +47,7 @@ public:
 	bool	hasEnteredPassword() const;
 	bool	isFullyRegistered() const;
 	bool	isGlobalOperator() const;
+	bool	isPendingDisconnect() const;
 
 	// Setters
 	void	setUsername(const std::string &user);
@@ -57,6 +59,7 @@ public:
 	void	setEnteredPassword(bool state);
 	void	setFullyRegistered(bool state);
 	void	setGlobalOperator(bool state);
+	void	setPendingDisconnect(bool state);
 
 	/* Logic methods */
 	// incomingBuffer

@@ -10,5 +10,6 @@ void Command::executeQUIT(Client* client, Server* server) {
     
     server->sendReply(client->getFd(), "ERROR :Closing Link: " + client->getNickname() + " (" + reason + ")\r\n");
 
-    server->removeClient(client->getFd(), reason);
+    //server->removeClient(client->getFd(), reason); -> J: Moving it to main loop to avoid race condition
+	client->setPendingDisconnect(true);
 }

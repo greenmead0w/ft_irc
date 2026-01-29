@@ -132,8 +132,8 @@ void Server::acceptNewConnection() {
     std::cout << "[Server] New connection from " << newClient->getIP() << " on FD " << clientFd << std::endl;
 
     //TESTING SERVER TO CLIENT COMMUNICATION
-    _clients[clientFd]->appendOutgoingBuffer("Welcome to the IRC Server!\r\n");
-    _clients[clientFd]->appendOutgoingBuffer("Please enter the PASS to continue.\r\n");
+    _clients[clientFd]->appendOutgoingBuffer(":ircserv NOTICE * :*** Welcome to the IRC Server!\r\n");
+    _clients[clientFd]->appendOutgoingBuffer(":ircserv NOTICE * :*** Please enter the PASS to continue.\r\n");
 }
 
 /* removes client from 1) channels 2)array of pollfds
@@ -350,6 +350,16 @@ void Server::run() {
                 i--;
                 continue;
             }
+
+			//Secure QUIT to avoid race condition and always show the ERROR message on user after disconnecting:
+			if (i < _fds.size() && _clients.count(_fds[i].fd)) {
+				Client* c = _clients[_fds[i].fd];
+				if (c->isPendingDisconnect() && c->getOutgoingBuffer().empty()) {
+					removeClient(_fds[i].fd);
+					i--;
+					continue;
+				}
+			}
         }
     }
 }

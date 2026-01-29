@@ -24,5 +24,7 @@ void	Command::executePASS(Client* client, Server* server) {
 		//send(client->getFd(), msg.c_str(), msg.length(), 0);
 		server->sendReply(client->getFd(), msg);
 		client->setEnteredPassword(false);
+		server->sendReply(client->getFd(), "ERROR :Closing Link: Incorrect password\r\n");
+		client->setPendingDisconnect(true);
 	}
 }

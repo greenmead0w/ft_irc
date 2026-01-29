@@ -59,6 +59,7 @@ std::string &Client::getOutgoingBuffer() { return _outgoingBuffer; }
 bool	Client::hasEnteredPassword() const { return _hasEnteredPassword; }
 bool	Client::isFullyRegistered() const { return _isFullyRegistered; }
 bool	Client::isGlobalOperator() const { return _isGlobalOperator; }
+bool	Client::isPendingDisconnect() const { return _pendingDisconnect; }
 
 // Setters
 void	Client::setUsername(const std::string &user) { _username = user; }
@@ -70,6 +71,7 @@ void	Client::setIP(const std::string &ip){ _clientIP = ip; }
 void	Client::setEnteredPassword(bool state){ _hasEnteredPassword = state; }
 void	Client::setFullyRegistered(bool state){ _isFullyRegistered = state; }
 void	Client::setGlobalOperator(bool state){ _isGlobalOperator = state; }
+void	Client::setPendingDisconnect(bool state) { _pendingDisconnect = state; }
 
 // Logic methods
 
