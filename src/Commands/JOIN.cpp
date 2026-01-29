@@ -17,8 +17,10 @@ void	Command::executeJOIN(Client* client, Server* server) {
 	}
 
 	std::string	chanName = _params[0];
+	std::string providedPass = (_params.size() > 1) ? _params[1] : ""; //check if password provided
+
 	if (chanName[0] != '#') {
-		// Channel name needs to start by # - IRC starndar
+		// Channel name needs to start by # - IRC standar
 		server->sendReply(client->getFd(), ":Channel name needs to start by #\r\n");
 		return ;
 	}
@@ -31,12 +33,32 @@ void	Command::executeJOIN(Client* client, Server* server) {
 		channel = new Channel(chanName);
 		server->addChannel(chanName, channel);
 		isNewChannel = true;
-	}
+	} else {
 
-	// Verify if user is already on channel or not:
-	if (channel->isClientInChannel(client->getFd())) {
+		// Verify if user is already on channel or not:
+		if (channel->isClientInChannel(client->getFd())) {
 		server->sendReply(client->getFd(), ":Client is already in channel\r\n");
 		return ;
+		}
+		
+		//check if can only join via invite
+		if (channel->isInviteOnlyChannel() && !channel->isInvited(client->getFd())) {
+            server->sendReply(client->getFd(), ":ircserv 473 " + client->getNickname() + " " + chanName + " :Cannot join channel (+i)\r\n");
+            return;
+        }
+
+		//check if channel requires pwd to join (+k)
+		if (channel->hasPassword() && providedPass != channel->getPassword()) {
+            server->sendReply(client->getFd(), ":ircserv 475 " + client->getNickname() + " " + chanName + " :Cannot join channel (+k)\r\n");
+            return;
+        }
+
+		//check if channel has limit number of users
+		if (channel->hasLimit() && channel->getUserCount() >= channel->getLimit()) {
+            server->sendReply(client->getFd(), ":ircserv 471 " + client->getNickname() + " " + chanName + " :Cannot join channel (+l)\r\n");
+            return;
+        }
+
 	}
 
 	// Add client to the channel: 
@@ -44,6 +66,11 @@ void	Command::executeJOIN(Client* client, Server* server) {
 	if (isNewChannel) {
 		channel->addOperator(client->getFd());
 	}
+
+	//remove invite if client used one to join
+	if (channel->isInvited(client->getFd()))
+		channel->removeInvite(client->getFd());
+
 
 	// Lets send a broadcast to the channel notifying the JOIN:
 	std::string joinBroadcast = ":" + client->getNickname() + "!" + client->getUsername() + "@localhost JOIN " + chanName + "\r\n";

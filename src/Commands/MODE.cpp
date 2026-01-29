@@ -106,7 +106,7 @@ bool Command::applyChannelModes(Server* server, Channel* chan, std::string& appl
 
 void Command::executeMODE(Client* client, Server* server) {
     // ERR_NEEDMOREPARAMS - 461
-    if (_params.size() < 2) {
+    if (_params.size() < 1) {
         server->sendReply(client->getFd(), ":ircserv 461 " + client->getNickname() + " MODE :Not enough parameters\r\n");
         return;
     }
@@ -125,7 +125,7 @@ void Command::executeMODE(Client* client, Server* server) {
         return;
     }
 
-    // Read MODE cmd request (doesn't return operator list)
+    // View MODE cmd request (doesn't return operator list)
     if (_params.size() == 1) {
         std::string modeList = "+";
         std::string modeParams;
