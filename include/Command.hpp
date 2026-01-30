@@ -15,6 +15,13 @@ private:
 	std::string					_cmdName;
 	std::vector<std::string>	_params;
 
+	
+	typedef void (Command::*cmdHandler)(Client*, Server*); //?
+
+	std::map<std::string, cmdHandler> _handlers; //map of cmds to functions
+
+	void initHandlers(); //fills functions in cmd map
+
 	//executeMODE parsing helper
 	bool	applyChannelModes(Server* server, Channel* chan, std::string& appliedModes, std::string& modeParams);
 
