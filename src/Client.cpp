@@ -4,13 +4,15 @@ Client::Client() :
 	_fd(-1),
 	_hasEnteredPassword(false),
 	_isFullyRegistered(false),
-	_isGlobalOperator(false) {}
+	_isGlobalOperator(false),
+	_pendingDisconnect(false) {}
 
 Client::Client(int fd) : 
 	_fd(fd),
 	_hasEnteredPassword(false),
 	_isFullyRegistered(false),
-	_isGlobalOperator(false) {}
+	_isGlobalOperator(false),
+	_pendingDisconnect(false) {}
 
 Client::~Client() {}
 
@@ -26,7 +28,8 @@ Client::Client(const Client &copy) :
     _incomingBuffer(copy._incomingBuffer),
     _clientIP(copy._clientIP),
     _isGlobalOperator(copy._isGlobalOperator),
-    _invitedTo(copy._invitedTo) {}
+    _invitedTo(copy._invitedTo),
+	_pendingDisconnect(copy._pendingDisconnect) {}
 
 // Canonical assignation operator:
 Client	&Client::operator=(const Client &copy) {
@@ -42,6 +45,7 @@ Client	&Client::operator=(const Client &copy) {
 		this->_clientIP = copy._clientIP;
 		this->_isGlobalOperator = copy._isGlobalOperator;
 		this->_invitedTo = copy._invitedTo;
+		this->_pendingDisconnect = copy._pendingDisconnect;
 	}
 	return *this;
 }

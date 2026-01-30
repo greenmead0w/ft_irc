@@ -16,7 +16,6 @@ private:
 	// Auth states
 	bool		_hasEnteredPassword;
 	bool		_isFullyRegistered;
-	bool		_pendingDisconnect;
 
 	// Network management
 	std::string	_incomingBuffer; //relative to server, what client sends
@@ -26,6 +25,9 @@ private:
 	// Permission & security
 	bool	_isGlobalOperator;
 	std::set<std::string>	_invitedTo;
+
+	//Disconnection:
+	bool		_pendingDisconnect;
 
 public:
 	Client();

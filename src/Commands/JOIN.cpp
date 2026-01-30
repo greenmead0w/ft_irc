@@ -20,9 +20,13 @@ void	Command::executeJOIN(Client* client, Server* server) {
 	std::string	chanName = _params[0];
 	std::string providedPass = (_params.size() > 1) ? _params[1] : ""; //check if password provided
 
-	if (chanName[0] != '#') {
-		// Channel name needs to start by # - IRC standar
-		server->sendReply(client->getFd(), ":Channel name needs to start by #\r\n");
+	if (chanName.size() < 2 || chanName.size() > 50 || chanName[0] != '#' || chanName.find_first_of(" ,^G") != std::string::npos) {
+		// Channel name needs to start by # and have at least 1 char after. Also a maximum of 50 chars is permitted - IRC standar
+		// We are also checking that it doesn't contain invalid chars (spaces, commas, or ^G)
+		//476 - ERR_BADCHANMASK
+		server->sendReply(client->getFd(), ":ircserv 476 " + client->getNickname() + " " + chanName + " :Bad Channel Mask\r\n");
+		server->sendReply(client->getFd(), ":ircserv NOTICE "  + client->getNickname() +
+			" :Channel name needs to start by #. Don't use invalid chars. Min length = 1. Max length = 50. Multiple JOIN not permitted in our server\r\n");
 		return ;
 	}
 

@@ -18,6 +18,15 @@ void	Command::executeNICK(Client* client, Server* server) {
 	}
 
 	std::string newNick = _params[0];
+	// Parsing the nick: can't start by * or numbers. Either with '#'. Special chars are also forbidden:
+	if (newNick == "*" || newNick.empty() || newNick.size() > 9 ||
+		newNick.find_first_of(" ,*?!@#$.") != std::string::npos || isdigit(newNick[0])) {
+			// 432 - ERR_ERRONEUSNICKNAME
+			server->sendReply(client->getFd(), ":ircserv 432 * " + newNick + " :Erroneous nickname\r\n");
+			server->sendReply(client->getFd(), ":ircserv NOTICE * :*** Invalid Nickname. Rules: Max 9 chars, cannot start with a number or '#', and no special characters ( ,*?!@#$.)\r\n");
+        	return;
+		}
+
 
 	// Check if nickname is already used
 	Client *existing = server->getClientByNickname(newNick);
