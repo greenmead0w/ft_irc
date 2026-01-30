@@ -13,6 +13,7 @@ void	Command::executeJOIN(Client* client, Server* server) {
 	if (this->_params.empty()) {
 		// ERR_NEEDMOREPARAMS - 461
 		server->sendReply(client->getFd(), ":ircserv 461 " + client->getNickname() + " JOIN :Not enough parameters\r\n");
+		server->sendReply(client->getFd(), ":ircserv NOTICE "  + client->getNickname() + " :*** Usage: JOIN #<channel>\r\n");
 		return ;
 	}
 

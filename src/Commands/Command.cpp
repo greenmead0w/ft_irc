@@ -99,39 +99,10 @@ void Command::execute(Client* client, Server* server) {
         (this->*handler)(client, server);
     } 
     else {
-        //si ponen comando que no existe, igual hay que mejorar el mensaje
+        //If you enter a command that does not exist, the message may still needs to be improved. 
 		//ERR_UNKNOWNCOMMAND - 421
 		server->sendReply(client->getFd(), ":ircserv 421 * :Unknown command used\r\n");
     }
 }
-
-// void Command::execute(Client* client, Server* server) {
-// 	if (_cmdName == "PASS") 
-// 		this->executePASS(client, server);
-// 	// Only if pass return exit:
-// 	else if (client->hasEnteredPassword()) {
-// 		if (_cmdName == "NICK")
-// 			this->executeNICK(client, server);
-// 		else if (_cmdName == "USER")
-// 			this->executeUSER(client, server);
-// 		else if (_cmdName == "PRIVMSG")
-//             this->executePRIVMSG(client, server);
-// 		else if (_cmdName == "JOIN")
-//             this->executeJOIN(client, server);	
-// 		else if (_cmdName == "PART")
-//             this->executePART(client, server);		
-// 		else if (_cmdName == "QUIT")
-// 			this->executeQUIT(client, server);
-// 		else if (_cmdName == "KICK")
-// 			this->executeKICK(client, server);
-// 		else if (_cmdName == "TOPIC")
-// 			this->executeTOPIC(client, server);
-// 		else if (_cmdName == "MODE")
-// 			this->executeMODE(client, server);
-// 		else if (_cmdName == "INVITE")
-// 			this->executeINVITE(client, server);
-// 	}
-		
-// }
 
 std::string	Command::getCmdName() const { return _cmdName; }
