@@ -1,1 +1,0 @@
-//Macros for IRC numeric replies (e.g., 001, 461)
