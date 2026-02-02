@@ -112,7 +112,6 @@ void Command::executeMODE(Client* client, Server* server) {
     }
 
     std::string target = _params[0];
-    std::string modeString = _params[1];
 
     //only channel mode supported
     if (target[0] != '#')

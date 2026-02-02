@@ -132,8 +132,9 @@ void Server::acceptNewConnection() {
     std::cout << "[Server] New connection from " << newClient->getIP() << " on FD " << clientFd << std::endl;
 
     //TESTING SERVER TO CLIENT COMMUNICATION
-    _clients[clientFd]->appendOutgoingBuffer(":ircserv NOTICE * :*** Welcome to the IRC Server!\r\n");
-    _clients[clientFd]->appendOutgoingBuffer(":ircserv NOTICE * :*** Please enter the PASS to continue.\r\n");
+    //_clients[clientFd]->appendOutgoingBuffer(":ircserv NOTICE * :*** Welcome to the IRC Server!\r\n");
+    //_clients[clientFd]->appendOutgoingBuffer(":ircserv NOTICE * :*** Please enter the PASS to continue.\r\n");
+    //_clients[clientFd]->appendOutgoingBuffer(":ircserv NOTICE * :*** PASS needed to continue.\r\n");
 }
 
 /* removes client from 1) channels 2)array of pollfds

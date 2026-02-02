@@ -98,11 +98,12 @@ void Command::execute(Client* client, Server* server) {
         //execute function by calling pointer
         (this->*handler)(client, server);
     } 
-    else {
-        //If you enter a command that does not exist, the message may still needs to be improved. 
-		//ERR_UNKNOWNCOMMAND - 421
-		server->sendReply(client->getFd(), ":ircserv 421 * :Unknown command used\r\n");
-    }
+	//MUTEADO por el momento porque hexchat manda algunos comandos por defecto y no queda bien printear eso
+    // else {
+    //     //If you enter a command that does not exist, the message may still needs to be improved. 
+	// 	//ERR_UNKNOWNCOMMAND - 421
+	// 	server->sendReply(client->getFd(), ":ircserv 421 * :Unknown command used\r\n");
+    // }
 }
 
 std::string	Command::getCmdName() const { return _cmdName; }

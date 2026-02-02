@@ -51,7 +51,7 @@ void	Command::executeNICK(Client* client, Server* server) {
 	if (!client->getUsername().empty() && !client->isFullyRegistered()) {
 		client->setFullyRegistered(true);
 		//Welcome message RPL_WELCOME
-		std::string	msg = ":ircserv 001 " + newNick + "  :Welcome to our IRC server :D\r\n";
+		std::string	msg = ":ircserv 001 " + newNick + " :Welcome to our IRC server :D\r\n";
 		//send(client->getFd(), msg.c_str(), msg.length(), 0);
 		server->sendReply(client->getFd(), msg);
 	}
