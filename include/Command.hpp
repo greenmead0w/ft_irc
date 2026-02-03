@@ -25,6 +25,9 @@ private:
 	//executeMODE parsing helper
 	bool	applyChannelModes(Server* server, Channel* chan, std::string& appliedModes, std::string& modeParams);
 
+	//flags 
+	static bool isIgnoredCommand(const std::string& cmd);
+
 public: 
 	Command();
 	Command(const Command &copy);

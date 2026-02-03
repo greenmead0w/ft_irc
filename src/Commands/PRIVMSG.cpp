@@ -14,10 +14,14 @@ void Command::executePRIVMSG(Client* client, Server* server) {
     }
 
     //expected params: PRIVMSG <target> :<message>
-    if (_params.size() < 2) {
-        //ERR_NORECIPIENT - 411
-        std::string	msg = ":ircserv 411 " + client->getNickname() + " :No recipient given (PRIVMSG)\r\n";
-        server->sendReply(client->getFd(), msg);
+    if (_params.empty()) {
+        server->sendReply(client->getFd(),
+            ":ircserv 411 " + client->getNickname() + " :No recipient given (PRIVMSG)\r\n");
+        return;
+    }
+    if (_params.size() == 1) {
+        server->sendReply(client->getFd(),
+            ":ircserv 412 " + client->getNickname() + " :No text to send\r\n");
         return;
     }
 
@@ -38,8 +42,9 @@ void Command::executePRIVMSG(Client* client, Server* server) {
             return;
         }
 
-        // Broadcast to everyone except the sender
-        std::string formatted = ":" + client->getNickname() + " PRIVMSG " + target + " :" + _params[1] + "\r\n";
+        // Broadcast to everyone except the sender. localhost hardcoded for format
+        std::string formatted = ":" + client->getNickname() + "!" + 
+            client->getUsername() + "@localhost PRIVMSG " + target + " :" + _params[1] + "\r\n";
         chan->broadcast(formatted, server, client->getFd());
 
     }

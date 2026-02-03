@@ -7,6 +7,10 @@ void	Command::executeJOIN(Client* client, Server* server) {
 	if (!client->isFullyRegistered()) {
 		// ERR_NOTREGISTERED - 451
 		server->sendReply(client->getFd(), ":ircserv 451 * : You aren't registered yet\r\n");
+		
+		server->sendReply(client->getFd(), ":ircserv 451 " +
+			(client->getNickname().empty() ? "*" : client->getNickname()) + " :You have not registered\r\n");
+
 		return ;
 	}
 

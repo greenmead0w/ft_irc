@@ -33,6 +33,28 @@ void Command::initHandlers() {
     _handlers["INVITE"] = &Command::executeINVITE;
 }
 
+//prevent HexChat default commands to trigger an "unknown command" message
+bool Command::isIgnoredCommand(const std::string& cmd) {
+    static std::set<std::string> ignored;
+    static bool initialized = false;
+
+    if (!initialized) {
+        ignored.insert("WHO");
+        ignored.insert("ISON");
+        ignored.insert("USERHOST");
+        ignored.insert("TIME");
+        ignored.insert("LUSERS");
+        ignored.insert("CAP");
+        ignored.insert("NAMES");
+        ignored.insert("PING");
+        initialized = true;
+    }
+
+    return ignored.count(cmd) != 0;
+}
+
+
+
 // Parses a raw command line into a command name and its params
 void Command::parse(const std::string &line) {
 	this->_rawLine = line;
@@ -97,13 +119,15 @@ void Command::execute(Client* client, Server* server) {
 
         //execute function by calling pointer
         (this->*handler)(client, server);
-    } 
-	//MUTEADO por el momento porque hexchat manda algunos comandos por defecto y no queda bien printear eso
-    // else {
-    //     //If you enter a command that does not exist, the message may still needs to be improved. 
-	// 	//ERR_UNKNOWNCOMMAND - 421
-	// 	server->sendReply(client->getFd(), ":ircserv 421 * :Unknown command used\r\n");
-    // }
+		return;
+    }
+
+	//check if cmd is part of HexChat automatic commands
+	if (Command::isIgnoredCommand(_cmdName))
+		return;
+
+	//helper, specially for nc connections
+    server->sendReply(client->getFd(),":ircserv 421 * " + _cmdName + " :Unknown command\r\n");
 }
 
 std::string	Command::getCmdName() const { return _cmdName; }
