@@ -17,7 +17,7 @@ void Command::executeINVITE(Client* client, Server* server) {
 
     if (!chan) { 
         // ERR_NOSUCHCHANNEL - 403
-        server->sendReply(client->getFd(), ":ircserv 403 " + client->getNickname() + " " + targetNick + " :No such channel\r\n");
+        server->sendReply(client->getFd(), ":ircserv 403 " + client->getNickname() + " " + chanName + " :No such channel\r\n");
         return; 
     }
 

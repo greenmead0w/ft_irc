@@ -8,7 +8,7 @@ void	Command::executeUSER(Client* client, Server* server) {
 
 	if (!client->hasEnteredPassword()) {
 		// ERR_NOTREGISTERED	
-		std::string	msg = ":ircserv 451 * :User not registered\r\n";
+		std::string	msg = ":ircserv 451 " + client->getNickname() + " :User not registered\r\n";
         //send(client->getFd(), msg.c_str(), msg.length(), 0);
 		server->sendReply(client->getFd(), msg);
         return;
@@ -17,7 +17,7 @@ void	Command::executeUSER(Client* client, Server* server) {
 	//Avoid double register
 	if (client->isFullyRegistered()) {
 		//ERR_ALREADYREGISTERED
-		std::string	msg = ":ircserv 462 :Already registered\r\n";
+		std::string	msg = ":ircserv 462 " +  client->getNickname() + " :Already registered\r\n";
         //send(client->getFd(), msg.c_str(), msg.length(), 0);
 		server->sendReply(client->getFd(), msg);
         return;
@@ -25,7 +25,7 @@ void	Command::executeUSER(Client* client, Server* server) {
 
 	if (this->_params.size() < 4) {
 		// ERR_NEEDMOREPARAMS	
-		std::string	msg = ":ircserv 461 :Not enough parameters\r\n";
+		std::string	msg = ":ircserv 461 " + client->getNickname() + " USER :Not enough parameters\r\n";
         //send(client->getFd(), msg.c_str(), msg.length(), 0);
 		server->sendReply(client->getFd(), msg);
         return;
