@@ -1,4 +1,6 @@
 #include "Client.hpp"
+#include <iostream>
+
 
 Client::Client() : 
 	_fd(-1),
@@ -92,9 +94,13 @@ void	Client::clearIncomingBuffer() {
    returns "" if buffer is empty or holds partial cmd
    cleans buffer up to \n */
 std::string Client::getNextCommand() {
+	//add this line for debugging purposes when evaluator inputs partial messages
+	//std::cout << "[DEBUG] Buffer before extraction: [" << _incomingBuffer << "]" << std::endl;
+
     size_t pos = _incomingBuffer.find("\n");
     if (pos == std::string::npos)
         return "";
+	
 
     std::string cmd = _incomingBuffer.substr(0, pos);
     _incomingBuffer.erase(0, pos + 1);
@@ -105,6 +111,9 @@ std::string Client::getNextCommand() {
         
     return cmd;
 }
+
+
+
 
 void Client::appendOutgoingBuffer(const std::string &msg) {
     _outgoingBuffer += msg;
