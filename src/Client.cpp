@@ -94,7 +94,7 @@ void	Client::clearIncomingBuffer() {
    returns "" if buffer is empty or holds partial cmd
    cleans buffer up to \n */
 std::string Client::getNextCommand() {
-	//add this line for debugging purposes when evaluator inputs partial messages
+	//add this line for debugging purposes when evaluator inputs partial messages3
 	//std::cout << "[DEBUG] Buffer before extraction: [" << _incomingBuffer << "]" << std::endl;
 
     size_t pos = _incomingBuffer.find("\n");

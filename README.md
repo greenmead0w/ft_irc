@@ -1,6 +1,3 @@
-# ft_irc
-ft_irc project for 42 Málaga.
-
 *This project has been created as part of the 42 curriculum by [mzuloaga](https://profile-v3.intra.42.fr/users/mzuloaga) & [jotrujil](https://profile-v3.intra.42.fr/users/jotrujil)*
 
 ## Description 
@@ -9,13 +6,15 @@ This project consists of developing a fully functional IRC (Internet Relay Chat)
 
 The server handles user authentication, channel creation, and the exchange of private messages or group discussions. It also implements user roles and operator privileges for channel moderation, such as kicking or inviting users.
 
+## Instructions
+
 Instructions To compile and run the server, follow these steps according to the project requirements:
 
 1.  Compilation: Use the provided Makefile to generate the ircserv executable. It must include the mandatory rules: all, clean, fclean, and re. Run in your terminal: make.
 
 2.  Execution: The program requires a port and a network password to operate: ./ircserv <port> <password>.
 
-3.  Connection: You can use any reference IRC client (like HexChat or Irssi) or even nc to conect to the server using the local IP and the chosen port.
+3.  Connection: You can use any reference IRC client (like HexChat or Irssi) or even nc to conect to the server using the local IP and the chosen port. We have used HexChat as our reference client.
 
 ## Resources 
 
@@ -32,12 +31,17 @@ The following sources were consulted during the development of this server:
 
 In compliance with project rules, the use of AI tools is detailed below:
 
+-   Project requirements + concepts understanding like what are sockets, poll() and fcntl() functions, etc.  
+
 -   Tasks: AI was used to generate ideas for the command parser structure and to design "stress" test cases, such as handling partial commands and unextpected disconnections.
 
 -   Parts of the project: Assistance focused mainly on the parameter validation logic for the MODE command and optimizing input/output buffers to ensure non-blocking behavior. All generated content was reviewed, tested, and fully understood to ensure server stability.
+
 -   README: Yes, we also used AI to help us generate this document.
 
 ## Features
+
+-   Our reference client: HexChat
 
 The server supports the following mandatory functionalities:
 
